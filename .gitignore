@@ -1,0 +1,4 @@
+*.vcd
+*.vvp
+*.wav
+.DS_Store
