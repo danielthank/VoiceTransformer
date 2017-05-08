@@ -1,0 +1,75 @@
+# Read Design
+read_file -format verilog verilog/top.v
+read_file -format verilog verilog/i2c_init.v
+read_file -format verilog verilog/i2s_read.v
+read_file -format verilog verilog/i2s_write.v
+
+current_design top
+uniquify
+link
+
+# Set the Optimization Constraints 
+create_clock -period 77.6 -name "mclk" -waveform {0 5} "mclk"
+set_dont_touch_network [get_ports mclk]
+set_fix_hold [get_clocks mclk]
+set_clock_uncertainty  0.1  [get_clocks mclk]
+set_clock_latency      0.5  [get_clocks mclk]
+set_input_delay -max 1 -clock mclk [all_inputs]
+set_output_delay -min 0.5 -clock mclk [all_outputs]
+
+create_clock -period 310.4 -name "bclk" -waveform {0 5} "bclk"
+set_dont_touch_network [get_ports bclk]
+set_fix_hold [get_clocks bclk]
+set_clock_uncertainty  0.1  [get_clocks bclk]
+set_clock_latency      0.5  [get_clocks bclk]
+set_input_delay -max 1 -clock bclk [all_inputs]
+set_output_delay -min 0.5 -clock bclk [all_outputs]
+
+create_clock -period 19865.6 -name "adclrc" -waveform {0 5} "adclrc"
+set_dont_touch_network [get_ports adclrc]
+set_fix_hold [get_clocks adclrc]
+set_clock_uncertainty  0.1  [get_clocks adclrc]
+set_clock_latency      0.5  [get_clocks adclrc]
+set_input_delay -max 1 -clock adclrc [all_inputs]
+set_output_delay -min 0.5 -clock adclrc [all_outputs]
+
+create_clock -period 19865.6 -name "daclrc" -waveform {0 5} "daclrc"
+set_dont_touch_network [get_ports daclrc]
+set_fix_hold [get_clocks daclrc]
+set_clock_uncertainty  0.1  [get_clocks daclrc]
+set_clock_latency      0.5  [get_clocks daclrc]
+set_input_delay -max 1 -clock daclrc [all_inputs]
+set_output_delay -min 0.5 -clock daclrc [all_outputs]
+
+
+# Define the design environment
+set_drive 1 [all_inputs]
+set_load  1 [all_outputs]
+
+
+set_fix_multiple_port_nets -all -buffer_constants
+
+#set_operating_conditions -min_library fsa0m_a_generic_core_ff1p98vm40c -min fsa0m_a_generic_core_ff1p98vm40c -max_library fsa0m_a_generic_core_ss1p62v125c -max fsa0m_a_generic_core_ss1p62v125c 
+set_wire_load_model -name G200K -library fsa0m_a_generic_core_tt1p8v25c
+
+set_max_area 0
+set_max_fanout 6 top
+set_boundary_optimization {"*"}
+
+check_design
+
+# remove_attribute [find -hierarchy design {"*"}] dont_touch
+
+# Map and Optimize the Design
+compile -map_effort medium
+
+# Analyze and debug the design
+report_area > out/area_alu.out
+report_power > out/power_alu.out
+report_timing -path full -delay max > out/timing_alu.out
+
+#write -format db -hierarchy -output $active_design.db
+write -format verilog -hierarchy -output verilog/top_syn.v
+write_sdf -version 2.1 -context verilog verilog/top.sdf
+write_sdc verilog/top.sdc
+exit

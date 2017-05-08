@@ -43,6 +43,7 @@ always @(*) begin
     bit_idx_w = bit_idx_r;
     state_w = state_r;
     sdat_w = sdat_r;
+    buffer_w = buffer_r;
     case (state_r)
         STATE_IDLE: begin
             if (bit_idx_r == 3'd1) begin

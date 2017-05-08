@@ -2,3 +2,17 @@
 *.vvp
 *.wav
 .DS_Store
+*.mr
+*.log
+*.svf
+*.pvl
+*.syn
+out/
+INCA_libs/
+nWaveLog/
+*.log
+*.fsdb
+*.sdc
+*.sdf
+*_syn.v
+vfastLog/

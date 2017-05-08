@@ -50,6 +50,7 @@ always @(*) begin
     state_w = state_r;
     audio_w = audio_r;
     audio_ready_w = audio_ready_r;
+    counter_w = counter_r;
     case (state_r)
         STATE_INIT: begin
             if (i2c_finish == 1'b1) begin

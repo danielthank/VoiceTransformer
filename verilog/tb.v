@@ -43,9 +43,9 @@ integer i, j;
 
 initial begin
     # 50000
-    for (i=0; i<10; i++) begin
+    for (i=0; i<10; i=i+1) begin
         @(negedge lrc);
-        for (j=0; j<16; j++) begin
+        for (j=0; j<16; j=j+1) begin
             @(negedge bclk);
             adcdat = audio_data[i][15-j];
         end
