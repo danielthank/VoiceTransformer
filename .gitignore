@@ -16,3 +16,4 @@ nWaveLog/
 *.sdf
 *_syn.v
 vfastLog/
+python/.ipynb_checkpoints/
