@@ -4,11 +4,13 @@ import numpy as np
 def toPolar(x,y,precision):
     angle = [11520, 6801, 3593, 1824, 916, 458, 229, 115, 57,
             29, 14, 7, 4, 2, 1]
+    angle2 = [2880.0, 1700.0, 898.0, 456.0, 229.0, 115.0, 57.0, 29.0]
     x_new = 0
     y_new = 0
     angleSum = 0
     quardrant = 0
     lenScale = 1
+    angleScale = 64.
 
     #x *= 1024
     #y *= 1024
@@ -28,34 +30,41 @@ def toPolar(x,y,precision):
             x = -x
 
         for i in range(0,precision):
-            lenScale *= np.cos(angle[i]/256/180*np.pi)
+            lenScale *= np.cos(angle2[i]/angleScale/180*np.pi)
             if y>0:
                 x_new = x + (y/np.power(2,i))
                 y_new = -(x/np.power(2,i)) + y
                 x = x_new
                 y = y_new
-                angleSum += angle[i]
+                angleSum += angle2[i]
             else:
                 x_new = x - (y/np.power(2,i))
                 y_new = (x/np.power(2,i)) + y
                 x = x_new
                 y = y_new
-                angleSum -= angle[i]
+                angleSum -= angle2[i]
+            print (i)
+            print (angleSum)
+            print (x)
+            print (y)
+            print ()
         if quardrant == 2:
-            return 180 - angleSum/256, x*lenScale
+            return 180 - angleSum/angleScale, x*lenScale
         elif quardrant == 3:
-            return -180 - angleSum/256, x*lenScale
+            return -180 - angleSum/angleScale, x*lenScale
         else:
-            return angleSum/256, x*lenScale
+            return angleSum/angleScale, x*lenScale
 
 def toRect(r,theta,precision):
     angle = [11520, 6801, 3593, 1824, 916, 458, 229, 115, 57,
             29, 14, 7, 4, 2, 1]
+    angle2 = [2880.0, 1700.0, 898.0, 456.0, 229.0, 115.0, 57.0, 29.0]
     x = 0.
     y = 0.
     quardrant = 0
     angleSum = 0
     lenScale = 1
+    angleScale = 64
 
     if theta == 0:
         return r, 0
@@ -70,19 +79,29 @@ def toRect(r,theta,precision):
             quardrant = 3
             theta = -(180 + theta)
         for i in range(0,precision):
-            lenScale *= np.cos(angle[i]/256/180*np.pi)
+            lenScale *= np.cos(angle2[i]/angleScale/180*np.pi)
 
         x = r*lenScale
-        angleSum = theta*256
+        angleSum = theta*angleScale
+        print(angleSum)
+        print("x:"+str(x)+" r:"+str(r)+" lenScale:"+str(lenScale)
+                +" lenScale*64:" + str(lenScale*64))
+        print(y)
+        print ()
 
         for i in range(0,precision):
             if angleSum>0:
                 #counter clockwise
                 x, y = x - (y/np.power(2,i)), (x/np.power(2,i)) + y
-                angleSum -= angle[i]
+                angleSum -= angle2[i]
             else:
                 x, y = x + (y/np.power(2,i)), -(x/np.power(2,i)) + y
-                angleSum += angle[i]
+                angleSum += angle2[i]
+            print (i)
+            print (angleSum)
+            print (x)
+            print (y)
+            print ()
         if quardrant == 2:
             return -x, y
         elif quardrant == 3:
