@@ -119,6 +119,13 @@ end
 */
 always @(negedge clk_n or negedge rst) begin
     if (rst == 1'b0) begin
+        data_idx_r <= 5'd0;
+        bit_idx_r <= 3'd0;
+        state_r <= STATE_IDLE;
+        buffer_r <= 8'd0;
+        sdat_r <= 1'b1;
+    end
+    else begin
         init_data[0]   <= {8'b00000000};
         init_data[1]   <= {8'b10010111};
         init_data[2]   <= {8'b00000010};
@@ -141,13 +148,6 @@ always @(negedge clk_n or negedge rst) begin
         init_data[19]  <= {8'b00000001};
         init_data[20]  <= {8'b00011110};
         init_data[21]  <= {8'b00000000};
-        data_idx_r <= 5'd0;
-        bit_idx_r <= 3'd0;
-        state_r <= STATE_IDLE;
-        buffer_r <= 8'd0;
-        sdat_r <= 1'b1;
-    end
-    else begin
         data_idx_r <= data_idx_w;
         bit_idx_r <= bit_idx_w;
         state_r <= state_w;

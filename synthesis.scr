@@ -64,9 +64,9 @@ check_design
 compile -map_effort medium
 
 # Analyze and debug the design
-report_area > out/area_alu.out
-report_power > out/power_alu.out
-report_timing -path full -delay max > out/timing_alu.out
+report_area > out/area.out
+report_power > out/power.out
+report_timing -path full -delay max > out/timing.out
 
 #write -format db -hierarchy -output $active_design.db
 write -format verilog -hierarchy -output verilog/top_syn.v

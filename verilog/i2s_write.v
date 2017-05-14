@@ -3,15 +3,13 @@ module i2s_write(
     rst,
     daclrc,
     dacdat,
-    data,
-    data_en
+    data
 );
 
 input clk_n;
 input rst;
 input daclrc;
 input [15:0] data;
-input data_en;
 
 output reg dacdat;
 
@@ -26,21 +24,18 @@ reg [2:0] state_r, state_w;
 reg [3:0] counter_r, counter_w;
 reg [15:0] buffer_r, buffer_w;
 reg [15:0] next_r, next_w;
+reg daclrc_new_r, daclrc_new_w;
 
 always @(*) begin
     state_w = state_r;
     counter_w = counter_r;
     buffer_w = buffer_r;
-    if (data_en) begin
-        next_w = data;
-    end
-    else begin
-        next_w = next_r;
-    end
+    next_w = data;
     dacdat = 1'b0;
+    daclrc_new_w = daclrc;
     case (state_r)
         STATE_IDLE:
-            if (daclrc == 1'b0) begin
+            if (daclrc_new_r == 1'b0) begin
                 state_w = STATE_LEFT_WAIT;
             end
             else begin
@@ -55,7 +50,7 @@ always @(*) begin
             buffer_w = {buffer_r[14:0], 1'b0};
         end
         STATE_LEFT_WAIT: begin
-            if (daclrc == 1'b1) begin
+            if (daclrc_new_r == 1'b1) begin
                 state_w = STATE_RIGHT;
                 counter_w = 4'd0;
                 buffer_w = next_r;
@@ -70,7 +65,7 @@ always @(*) begin
             buffer_w = {buffer_r[14:0], 1'b0};
         end
         STATE_RIGHT_WAIT: begin
-            if (daclrc == 1'b0) begin
+            if (daclrc_new_r == 1'b0) begin
                 state_w = STATE_LEFT;
                 counter_w = 4'd0;
                 buffer_w = next_r;
@@ -91,6 +86,15 @@ always @(negedge clk_n or negedge rst) begin
         counter_r <= counter_w;
         buffer_r <= buffer_w;
         next_r <= next_w;
+    end
+end
+
+always @(posedge clk_n or negedge rst) begin
+    if (rst == 1'b0) begin
+        daclrc_new_r <= 1'b0;
+    end
+    else begin
+        daclrc_new_r <= daclrc_new_w;
     end
 end
 
