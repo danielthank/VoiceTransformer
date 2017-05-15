@@ -1,7 +1,7 @@
 `timescale 1ns/10ps
-`define CYCLE     400.0                // Modify your clock period here
+`define CYCLE     1000.0                // Modify your clock period here
 `define CYCLE_CAL     10.0                // Modify your clock period here
-`define End_CYCLE  520      // Modify cycle times once your design need more cycle times!
+`define End_CYCLE  600      // Modify cycle times once your design need more cycle times!
 
 `define fft_fail_limit 48
 
@@ -32,6 +32,7 @@ initial $readmemh("fft_in2.dat", fft2_mem);
 
 integer i, j ,k, l,count;
 
+
 raiseFreq DUT(.clk(clk),.clk_cal(clk_cal),.rst(rst),.fft1_data(fft1_data),
     .fft1_valid(fft1_valid),.freq1(freq1),.fft1_fin(fft1_fin),
     .fft2_data(fft2_data),.fft2_valid(fft2_valid),.freq2(freq2),
@@ -58,8 +59,8 @@ initial begin
     clk         = 1'b0;
     clk_cal     = 1'b0;
     rst       = 1'b0; 
-    fft1_fin = 1;
-    fft2_fin = 1;
+    fft1_fin = 0;
+    fft2_fin = 0;
     freq1 = 6'b0;
     freq2 = 6'b0;
     en = 0;
@@ -91,13 +92,27 @@ always@(negedge clk ) begin
             //$display("\n");
             fft2_data <= fft2_mem[i];
             i <= i + 1;
-            freq1 <= i+1;
-            freq2 <= i+1;
+            if (j<64)begin
+                freq1 <= j;
+                freq2 <= j;
+                j <= j + 1;
+                if (j == 63)begin
+                    fft1_fin <= 1;
+                    fft2_fin <= 1;
+                end
+            end
+            else begin
+                freq1 <= 0;
+                freq2 <= 0;
+                j <= 1;
+                fft1_fin <= 0;
+                fft2_fin <= 0;
+            end
         end
     end
     fft1_valid <= en;
     fft2_valid <= en;
-    if(raise_fin) begin
+    if(i == 550) begin
         $display("-----------------------------------------------------");
         $display("-------------End of sim ----------------------------");
         $finish;	   
